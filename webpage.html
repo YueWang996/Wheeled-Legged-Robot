@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>AIQI-Motor-Demo</title>
+		<style type="text/css">
+			* {
+				-webkit-touch-callout: none;
+				-webkit-user-select: none;
+				-khtml-user-select: none;
+				-moz-user-select: none;
+				-ms-user-select: none;
+				user-select: none;
+			}
+			body{
+				background-color: #282c35;
+			}
+			button{
+				border-radius: 0.9375rem;
+				border: none;
+				background-color: #21242d;
+				box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+				border: 2px solid #aaffff;
+				color: #aaffff;
+				font-size:1.625rem;
+				width: 8rem;
+			}
+			button:active {
+			  background-color: #282c35;
+			  box-shadow: 0 4px 16px 0 rgba(0,0,0,0.2), 0 3px 20px 0 rgba(0,0,0,0.19);
+			  transform: translateY(4px);
+			}
+			#Angle_dec{
+				border: 2px solid #ff5500;
+				color: #ff5500;
+			}
+			#buttons{
+				height:auto;
+				width:auto;
+				text-align:center;
+				margin: 2.5rem;
+			}
+			#stream-container,#rocker-container{
+				height:auto; 
+				width:auto;
+				text-align:center;
+				margin: 0rem;
+			}
+			#rocker-container{
+				margin: 3rem;
+			}
+			#coordiv{
+				border: 2px solid #aaffff;
+				border-radius: 0.9375rem;
+			}
+			
+		</style>
+	</head>
+	<body>
+		<div id="buttons">
+			<button id="Angle_inc" onclick="AngleIncButton()">Angle +</button>
+			<button id="Angle_dec" onclick="AngleDecButton()">Angle -</button>
+		</div>
+		<div id="rocker-container">
+			<canvas id="coordiv" width="600" height="600"></canvas>
+			<div id="point-loc" style="color: #aaffff;"></div>
+		</div>
+	</body>
+	<script>
+			const rockercontainer = document.getElementById('rocker-container')	//摇杆容器
+			var coordiv = document.getElementById('coordiv');	//摇杆画布
+			
+			var baseHost = document.location.origin  //获取URL域名（ip）与端口号
+			var streamUrl = baseHost + ':80'	//esp32 摄像头arduino例程 摄像头流数据端口
+			
+			
+			//画布尺寸（需要与body内设置相同） 和 摇杆中心坐标（画布尺寸/2）
+			var coordiv_w = 600;
+			var coordiv_h = 600;
+			var center_x = coordiv_w/2;
+			var center_y = coordiv_h/2;
+			
+			
+			//摇杆初始化 显示中心坐标和手柄
+			var loc = "当前位置 x:"+parseFloat(center_x/(center_x/5))+",y:"+parseFloat(center_y/(center_y/5));
+			document.getElementById("point-loc").innerHTML = loc;
+			var ctx=coordiv.getContext("2d");	//画布初始化
+			new_coordinate(center_x,center_y);	//中心位置绘制圆形手柄 并显示坐标
+ 
+			//禁止手机双指缩放
+			var lastTouchEnd = 0;
+			document.documentElement.addEventListener('touchend', function (event) {
+			  var now = Date.now();
+			  if (now - lastTouchEnd <= 300) {
+				event.preventDefault();
+			  }
+			  lastTouchEnd = now;
+			}, false);
+			//禁止手机双击缩放
+			document.documentElement.addEventListener('touchstart', function (event) {
+			  if (event.touches.length > 1) {
+			    event.preventDefault();
+			  }
+			}, false);
+			
+			
+			//移动端浏览器 手指点击相关事件
+			coordiv.ontouchstart = function(e){//手指头触摸屏幕上的事件
+				var touch = e.touches[0] //获取第一个触点
+			    var x = this.offsetLeft		//e为当前事件 this为当前元素
+			    var y = this.offsetTop		//获取当前元素距离页面边界的距离
+				var NowX = parseFloat((touch.pageX - x))	//获取全局点击坐标 计算画布内点击坐标
+				var NowY = parseFloat((touch.pageY - y))
+				new_coordinate(NowX,NowY)	//重绘圆形手柄 并显示当前坐标
+			    document.ontouchmove = function(e){//手指头在屏幕上滑动触发的事件
+					touch = e.touches[0]; //获取第一个触点
+					NowX = parseFloat((touch.pageX - x))  //计算画布内点击坐标
+					NowY = parseFloat((touch.pageY - y))
+					new_coordinate(NowX,NowY) //重绘圆形手柄 并显示当前坐标
+			    }
+			    document.ontouchend = function(){//当手指从屏幕上离开的时候触发
+			        //清除事件
+					new_coordinate(center_x,center_y) //重绘圆形手柄 并显示当前坐标
+			        document.ontouchstart = null //清空点击事件
+			        document.ontouchmove = null
+			    }	
+			}
+			
+			//PC端浏览器 鼠标点击相关事件
+			coordiv.onmousedown = function(e){//鼠标按下触发事件
+			    var x = this.offsetLeft
+			    var y = this.offsetTop
+				var NowX = (e.clientX - x)
+				var NowY = (e.clientY - y)
+				new_coordinate(NowX,NowY)
+			    document.onmousemove = function(e){//鼠标按下时持续触发事件
+					NowX = (e.clientX - x)
+					NowY = (e.clientY - y)
+					new_coordinate(NowX,NowY)
+			    }
+			    document.onmouseup = function(){//鼠标抬起触发事件
+			        //清除事件
+					new_coordinate(center_x,center_y)
+			        document.onmouseup = null
+			        document.onmousemove = null
+			    }	
+			}
+			var LastX = parseFloat(center_x/(center_x/5.0))
+			var LastY = parseFloat(center_y/(center_y/5.0))
+			//绘制摇杆圆形手柄 并显示当前坐标
+			function new_coordinate(NowX,NowY){
+				if(NowX>=coordiv_w)NowX=coordiv_w
+				if(NowY>=coordiv_h)NowY=coordiv_h
+				if(NowX<=0)NowX=0
+				if(NowY<=0)NowY=0
+				ctx.clearRect(0, 0, coordiv_w, coordiv_h)	//清空画布
+				ctx.save()	//保存转态
+				ctx.beginPath() //开启路径
+				ctx.shadowBlur=10 //阴影宽度
+				ctx.shadowColor="#00ffff"	//阴影颜色
+				ctx.strokeStyle = "#aaffff";  //设置边线的颜色
+				ctx.arc(NowX, NowY, center_x/4,0,2*Math.PI) //画圆
+				ctx.fillStyle="#21242d" //填充颜色
+				ctx.fill()	//填充路径
+				ctx.stroke()	//绘制路径
+				ctx.closePath() // 关闭路径
+				ctx.restore()	//为画布重置为最近保存的图像状态
+				NowX = parseFloat(NowX/(center_x/5.0))
+				NowY = parseFloat(NowY/(center_y/5.0))
+				NowX_MAP = map(NowX, 0, 10, -0.1, 0.1).toFixed(3)
+				NowY_MAP = map(NowY, 0, 10, -0.1, 0.1).toFixed(3)
+				if(NowX!=LastX || NowY!=LastY)   //减小发送频率
+				{
+					//显示坐标
+					var loc = "当前位置 x:"+NowX_MAP+",y:"+NowY_MAP
+					document.getElementById("point-loc").innerHTML = loc
+					//发送坐标
+					const query = baseHost+"/rocker?x="+NowY_MAP+"&y="+NowX_MAP
+					fetch(query)
+					  .then(response => {
+					    console.log(`request to ${query} finished, status: ${response.status}`)
+					  })
+					LastX = NowX;
+					LastY = NowY;
+				}
+			}
+			
+			function map(number, inMin, inMax, outMin, outMax) {
+				return (number - inMin) * (outMax - outMin) / (inMax - inMin) + outMin;
+			}
+			
+			//禁用右键菜单
+			window.addEventListener('contextmenu', function (e) {
+				e.preventDefault()
+			})
+			
+			function AngleIncButton(){
+				const query = baseHost+"/angle-tune?angle=inc"
+					fetch(query)
+					  .then(response => {
+					    console.log(`request to ${query} finished, status: ${response.status}`)
+					})
+			}
+			
+			function AngleDecButton(){
+				const query = baseHost+"/angle-tune?angle=dec"
+					fetch(query)
+					  .then(response => {
+					    console.log(`request to ${query} finished, status: ${response.status}`)
+					})
+			}
+	</script>
+</html>
