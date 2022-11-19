@@ -21,13 +21,16 @@ Maybe you can refer to [this link (Chinese version)](https://www.bilibili.com/re
 
 ## Project Structure
 All source code is placed in the [src](https://github.com/YueWang996/Wheeled-Legged-Robot/tree/main/src).
-
-.
  * [src](./src)
-   * [CAN](./src/CAN)
-   * [MPU6050](./src/MPU6050)
-   * [ServoSDK](./src/ServoSDK)
-   * [utilities](./src/utilities)
-   * [imu.h/.cpp]()
+   * [CAN](./src/CAN) - CAN bus initialisation
+   * [MPU6050](./src/MPU6050) - MPU6050 drivers
+   * [ServoSDK](./src/ServoSDK) - Feetech servo driver modified for ESP32
+   * [imu.h/.cpp](./src) - IMU data acquire
+   * [Kalman.h/.cpp](./src) - A Kalman filter for data fusion of accelerometer and gyroscope readings from MPU6050
+   * [LowPass.h](./src) - A lowpass filter
+   * [MotorControl.h/.cpp](./src) - Controlling two BLDC motors and 4 servos to the desired position via CAN bus and serial port. Inverse kinematics is used to calculate servo positions;
+   * [WebPage.h](./src) - HTML code for web interface rendering;
+   * [Config.h](./src) - Some predefined static variables and data types;
+   * [main.cpp](./src) - Main entrance of the program.
 
-All model files are stored in the directory [Models](https://github.com/YueWang996/Wheeled-Legged-Robot/tree/main/Models).
+All model files are stored in the directory [Models](https://github.com/YueWang996/Wheeled-Legged-Robot/tree/main/Models). They are already verified by 3D printing.
