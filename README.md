@@ -11,10 +11,14 @@ There are two branches in this project--_Main_ and _MotorDriver_
 - Clion 2021.2.3
 - Python 3.9
 
-Maybe you can refer to [this link (Chinese version)](https://www.bilibili.com/read/cv15226500) to know how to configure and use ESP-IDF toolchain in Clion. 
+Maybe you can refer to [this link (Chinese version)](https://www.bilibili.com/read/cv15226500) to get more information about how to configure and use ESP-IDF toolchain in Clion. 
 
 ## Major Hardwares
 - ESP32-WROOM-32D
 - Feetech ST3215 serial servo * 4
 - Feetech servo control board
 - GY-521 (MPU6050)
+
+## Project Structure
+All source code is placed in the [src](https://github.com/YueWang996/Wheeled-Legged-Robot/tree/main/src).
+All model files are stored in the directory [Models](https://github.com/YueWang996/Wheeled-Legged-Robot/tree/main/Models).
