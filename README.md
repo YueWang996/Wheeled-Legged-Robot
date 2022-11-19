@@ -21,4 +21,13 @@ Maybe you can refer to [this link (Chinese version)](https://www.bilibili.com/re
 
 ## Project Structure
 All source code is placed in the [src](https://github.com/YueWang996/Wheeled-Legged-Robot/tree/main/src).
+
+.
+ * [src](./src)
+   * [CAN](./src/CAN)
+   * [MPU6050](./src/MPU6050)
+   * [ServoSDK](./src/ServoSDK)
+   * [utilities](./src/utilities)
+   * [imu.h/.cpp]()
+
 All model files are stored in the directory [Models](https://github.com/YueWang996/Wheeled-Legged-Robot/tree/main/Models).
