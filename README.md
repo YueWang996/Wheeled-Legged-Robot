@@ -8,7 +8,7 @@ There are two branches in this project--_Main_ and _MotorDriver_
 
 ## Environment
 - ESP-IDF 4.2
-- Clion 2021.2.3
+- CLion 2021.2.3
 - Python 3.9
 
 Maybe you can refer to [this link (Chinese version)](https://www.bilibili.com/read/cv15226500) to get more information about how to configure and use ESP-IDF toolchain in Clion. 
