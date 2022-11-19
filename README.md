@@ -27,7 +27,7 @@ All source code is placed in the [src](https://github.com/YueWang996/Wheeled-Leg
    * [ServoSDK](./src/ServoSDK) - Feetech servo driver modified for ESP32
    * [imu.h/.cpp](./src) - IMU data acquire
    * [Kalman.h/.cpp](./src) - A Kalman filter for data fusion of accelerometer and gyroscope readings from MPU6050
-   * [LowPass.h](./src) - A lowpass filter
+   * [LowPass.h](./src) - A lowpass filter library from TKJ Electronics
    * [MotorControl.h/.cpp](./src) - Controlling two BLDC motors and 4 servos to the desired position via CAN bus and serial port. Inverse kinematics is used to calculate servo positions;
    * [WebPage.h](./src) - HTML code for web interface rendering;
    * [Config.h](./src) - Some predefined static variables and data types;
